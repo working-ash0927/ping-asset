@@ -1,11 +1,12 @@
 // Sample
 pipeline {    
-    agent { // Default: agent any
-        node {
-            label 'dev'
-            // customWorkspace '/home/jenkins/factory'
-        }
-    }
+    Default: agent any
+    // agent {
+    //     node {
+    //         label 'dev'
+    //         customWorkspace '/home/jenkins/factory'
+    //     }
+    // }
     // options { timeout(time 3, unit: 'MINUTES') }
     
     environment { // Global Env
