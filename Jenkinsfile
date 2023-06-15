@@ -24,7 +24,7 @@ pipeline {
                 // sh 'go env' 
                 sh 'ls -al' // repo 최상위 경로
                 sh 'echo $PWD'
-                sh 'echo $(arch)' 
+                sh 'echo $(arch)'
                 // sh 'go build -o ./bin/ping-bin ping.go' 
                 // sh 'ls -al'
                 // sh 'tar zcvf ping-bin.tar.gz ./bin '
