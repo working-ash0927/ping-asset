@@ -14,14 +14,15 @@ pipeline {
         // AWS_SECRET_ACCESS_KEY   = credentials('')
         AWS_DEFAULT_REGION      = 'ap-northeast-2'
     }
-    tools { go '1.20.x' }
+    // tools { go '1.20.x' }
     stages {
         stage('Build') {
             steps {
-                sh 'go version'
+                // sh 'go version'
                 sh 'echo ${JENKINS_HOME}'
-                sh 'go env' 
+                // sh 'go env' 
                 sh 'ls -al' // repo 최상위 경로
+                
                 // sh 'go build -o ./bin/ping-bin ping.go' 
                 // sh 'ls -al'
                 // sh 'tar zcvf ping-bin.tar.gz ./bin '

@@ -38,14 +38,14 @@ func getIPAddr() string {
 }
 
 func sendPing(addr string) {
-	sensu_backend := getIPAddr()
+	source := getIPAddr()
 	target := addr
 	nowtime := getunixtime()
 	
 	// Pinger 생성
 	pinger, err := ping.NewPinger(target)  // 대상서버 IP 입력
 	if err != nil {
-		fmt.Printf("ping_test{sensu_backend=\"%s\", target=\"%s\"} %d %d\n", sensu_backend, target, 0, nowtime)
+		fmt.Printf("ping_test{source=\"%s\", target=\"%s\"} %d %d\n", source, target, 0, nowtime)
 		fmt.Printf("# failed to make new pinger: %s\n", err.Error())
 		return
 	}
@@ -65,10 +65,10 @@ func sendPing(addr string) {
 			stats.PacketsSent, stats.PacketsRecv, stats.PacketLoss, stats.AvgRtt)
 
 		if stats.PacketsRecv == 0 {
-			fmt.Printf("ping_test{sensu_backend=\"%s\", target=\"%s\"} %d %d\n", sensu_backend, target, 0, nowtime)
+			fmt.Printf("ping_test{source=\"%s\", target=\"%s\"} %d %d\n", source, target, 0, nowtime)
 			fmt.Println("# ping test failed or timed out")
 		} else{
-			fmt.Printf("ping_test{sensu_backend=\"%s\", target=\"%s\"} %d %d\n", sensu_backend, target, 1, nowtime)
+			fmt.Printf("ping_test{source=\"%s\", target=\"%s\"} %d %d\n", source, target, 1, nowtime)
 			fmt.Println("# ping test succeed")
 		}
 	}
