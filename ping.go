@@ -87,8 +87,6 @@ func main() {
 
 	// command 상의 변수 할당
 	flag.StringVar( &addr, "addr", "", "AWS region") // Ping을 보내려는 서버의 IP(즉, Sensu backend)
-
 	flag.Parse()
-
 	sendPing(addr)
 }
