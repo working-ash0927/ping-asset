@@ -30,9 +30,9 @@ pipeline {
                 sh 'go version'
                 sh 'echo ${JENKINS_HOME}'
                 sh 'go env'
-                timeout(time: 3, unit: 'MINUTES') {
-                    sh 'go run ec2count.go'
-                }
+                // timeout(time: 3, unit: 'MINUTES') {
+                //     sh 'go run ec2count.go'
+                // }
             }
         }
         stage('Test') {
