@@ -1,10 +1,10 @@
 // Sample
 pipeline {    
     // Default: agent node any
-    agent any 
+    agent none
     // agent {
     //     node {
-    //         label 'dev'
+    //         label 'amd64'
     //         // customWorkspace '/home/jenkins/factory'
     //     }
     // }
@@ -17,7 +17,14 @@ pipeline {
     }
     // tools { go '1.20.x' }
     stages {
-        stage('Build') {
+        stage('Build amd64') {
+            agent {
+                node {
+                    label 'amd64'
+                    // customWorkspace '/home/jenkins/factory'
+                }
+            }
+            
             steps {
                 // sh 'go version'
                 sh 'echo ${JENKINS_HOME}' 
@@ -34,6 +41,21 @@ pipeline {
                 // timeout(time: 3, unit: 'MINUTES') {
                 //     sh 'go run ec2count.go'
                 // }
+            }
+        }
+        stage('Build arm64') {
+            agent {
+                node {
+                    label 'arm64'
+                    // customWorkspace '/home/jenkins/factory'
+                }
+            }
+            
+            steps {
+                sh 'echo ${JENKINS_HOME}' 
+                sh 'ls -al' // repo 최상위 경로
+                sh 'echo $PWD'
+                sh 'echo $(arch)'
             }
         }
     }    
