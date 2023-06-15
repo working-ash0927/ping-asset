@@ -1,6 +1,6 @@
 // Sample
 pipeline {    
-    Default: any
+    Default: agent node any
     // agent {
     //     node {
     //         label 'dev'
