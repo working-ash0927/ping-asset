@@ -27,7 +27,7 @@ pipeline {
                 sh 'tar zcvf ping-bin.tar.gz ./bin '
                 sh 'echo $(sha512sum ping-bin.tar.gz)'
                 sh 'assethex=$(sha512sum ping-bin.tar.gz)'
-                sh 'echo $(assethex)'
+                sh 'echo $assethex'
                 // timeout(time: 3, unit: 'MINUTES') {
                 //     sh 'go run ec2count.go'
                 // }
