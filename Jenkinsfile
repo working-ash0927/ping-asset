@@ -13,7 +13,7 @@ pipeline {
         // AWS_SECRET_ACCESS_KEY   = credentials('')
         AWS_DEFAULT_REGION      = 'ap-northeast-2'
     }
-    tools { go '1.20.3' }
+    tools { go '1.20.x' }
     stages {
         stage('aws credentials test') {
             // local env this stage
