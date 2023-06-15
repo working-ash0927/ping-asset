@@ -22,12 +22,12 @@ pipeline {
                 sh 'echo ${JENKINS_HOME}'
                 sh 'go env'
                 sh 'ls -al' // repo 최상위 경로
-                sh 'go build -o ./bin/ping-bin ping.go' 
-                sh 'ls -al'
-                sh 'tar zcvf ping-bin.tar.gz ./bin '
-                sh 'echo $(sha512sum ping-bin.tar.gz)'
-                sh 'assethex=$(sha512sum ping-bin.tar.gz)'
-                sh 'echo $assethex'
+                // sh 'go build -o ./bin/ping-bin ping.go' 
+                // sh 'ls -al'
+                // sh 'tar zcvf ping-bin.tar.gz ./bin '
+                // sh 'echo $(sha512sum ping-bin.tar.gz)'
+                // sh 'assethex=$(sha512sum ping-bin.tar.gz)'
+                // sh 'echo $assethex'
                 // timeout(time: 3, unit: 'MINUTES') {
                 //     sh 'go run ec2count.go'
                 // }
