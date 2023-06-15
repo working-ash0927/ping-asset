@@ -1,7 +1,7 @@
 // Sample
 pipeline {    
     // Default: agent node any
-    agent none
+    agent any 
     // agent {
     //     node {
     //         label 'dev'
