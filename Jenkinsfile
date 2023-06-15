@@ -20,7 +20,7 @@ pipeline {
             steps {
                 sh 'go version'
                 sh 'echo ${JENKINS_HOME}'
-                sh 'go env'
+                sh 'go env' 
                 sh 'ls -al' // repo 최상위 경로
                 // sh 'go build -o ./bin/ping-bin ping.go' 
                 // sh 'ls -al'
