@@ -38,8 +38,8 @@ func getIPAddr() string {
 }
 
 func sendPing(addr string) {
-	source := getIPAddr()
-	target := addr
+	source := getIPAddr()  // icmp를 호출하는 주체 
+	target := addr         // icmp 패킷을 받는 대상
 	nowtime := getunixtime()
 	
 	// Pinger 생성
