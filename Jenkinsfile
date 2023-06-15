@@ -22,7 +22,7 @@ pipeline {
                 sh 'echo ${JENKINS_HOME}'
                 // sh 'go env' 
                 sh 'ls -al' // repo 최상위 경로
-                
+                sh '$PWD'
                 // sh 'go build -o ./bin/ping-bin ping.go' 
                 // sh 'ls -al'
                 // sh 'tar zcvf ping-bin.tar.gz ./bin '
@@ -32,16 +32,6 @@ pipeline {
                 // timeout(time: 3, unit: 'MINUTES') {
                 //     sh 'go run ec2count.go'
                 // }
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Testing..'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....'
             }
         }
     }    
