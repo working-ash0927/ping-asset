@@ -10,7 +10,7 @@ pipeline {
     // }
     // options { timeout(time 3, unit: 'MINUTES') }
     
-    environment { // Global Env
+    environment { // Global Env 
         // GO111MODULE = 'on'
         // AWS_SECRET_ACCESS_KEY   = credentials('')
         AWS_DEFAULT_REGION      = 'ap-northeast-2'
