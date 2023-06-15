@@ -16,21 +16,12 @@ pipeline {
     }
     tools { go '1.20.x' }
     stages {
-        stage('aws credentials test') {
-            // local env this stage
-            environment { testenv = 'testenv' }
-            steps { 
-                withAWS(credentials: 'ash', region: 'ap-northeast-2') {
-                    sh 'echo "<h1> this is error page </h1>" > error.html'
-                    s3Upload(file:'error.html', bucket:'thisiscloudfronttest', path:'web/')
-                }
-            }
-        }
         stage('Build') {
             steps {
                 sh 'go version'
                 sh 'echo ${JENKINS_HOME}'
                 sh 'go env'
+                sh ' ls -al'
                 // timeout(time: 3, unit: 'MINUTES') {
                 //     sh 'go run ec2count.go'
                 // }
