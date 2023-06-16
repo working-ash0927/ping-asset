@@ -67,7 +67,7 @@ pipeline {
                                 env.isdiffrent = false
                             }
                         } else {
-                            echo 'Not exists. Download ping-asset-amd64.tar.gz '
+                            echo 'Not exists. Download ping-asset-amd64.tar.gz'
                         }
                         if (env.isdiffrent == true) {
                             echo 'asset file upload'
