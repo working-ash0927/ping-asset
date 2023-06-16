@@ -32,7 +32,6 @@ func getIPAddr() string {
 			return ipNet.IP.String()
 		}
 	}
-
 	return "# failed to get IP of Agent"
 }
 
