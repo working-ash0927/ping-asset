@@ -8,7 +8,6 @@ import (
 	"github.com/go-ping/ping"
 )
 
-
 func getunixtime() int64 {
 	loc, err := time.LoadLocation("Asia/Seoul")
 	if err != nil {
