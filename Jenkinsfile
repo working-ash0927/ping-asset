@@ -21,18 +21,14 @@ pipeline {
             agent {
                 node {
                     label 'amd64'
-                    // customWorkspace '/home/jenkins/factory'
+                    customWorkspace '/var/lib/jenkins/workspace/ping-build'
                 }
-            }
-            
+            }            
             steps {
                 // sh 'go version'
-                sh 'echo ${JENKINS_HOME}' 
-                // sh 'go env' 
-                sh 'ls -al' // repo 최상위 경로
-                sh 'echo $PWD'
-                sh 'echo $(arch)'
                 sh 'echo $(hostname)'
+                sh 'echo ${JENKINS_HOME}' 
+                sh 'ls -al' // repo 최상위 경로
                 // sh 'go build -o ./bin/ping-bin ping.go' 
                 // sh 'ls -al'
                 // sh 'tar zcvf ping-bin.tar.gz ./bin '
@@ -48,7 +44,7 @@ pipeline {
             agent {
                 node {
                     label 'arm64'
-                    // customWorkspace '/home/jenkins/factory'
+                    customWorkspace '/var/lib/jenkins/workspace/ping-build/'
                 }
             }
             
