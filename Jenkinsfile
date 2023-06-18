@@ -8,7 +8,9 @@ pipeline {
     //         // customWorkspace '/home/jenkins/factory'
     //     }
     // }
-    options { timeout(time 2, unit: 'MINUTES') }
+    options { 
+        timeout(time 2, unit: 'MINUTES') 
+    }
     
     environment { // Global Env 
         // GO111MODULE = 'on'
@@ -197,14 +199,14 @@ pipeline {
         
         // ping-asset.yaml 코드를 업데이트
         stage('update ping-asset.yaml') {
-            agent {
-                node {
-                    label 'amd64'
-                }
-            }            
+            agent any           
             steps {
                 echo linux_arm64_hex
                 echo linux_amd64_hex
+                env.linux_arm64_hex = linux_arm64_hex
+                env.linux_amd64_hex = linux_amd64_hex
+                sh 'echo $linux_arm64_hex'
+                sh 'echo $linux_amd64_hex'
                 // script {
                 //     def result = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
                 //     env.assethex = result
