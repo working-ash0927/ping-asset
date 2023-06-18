@@ -115,6 +115,7 @@ pipeline {
                         withAWS(credentials: 'ash', region: 'ap-northeast-2') {
                             script {
                                 echo env.assethex
+                                sh '$assethex'
                                 def assetexists = s3DoesObjectExist(bucket:'thisiscloudfronttest', path:'test/ping-asset-amd64.tar.gz')
                                 env.assetexists = assetexists
                                 env.isdiffrent = true
