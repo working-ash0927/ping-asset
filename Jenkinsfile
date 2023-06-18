@@ -27,8 +27,15 @@ pipeline {
                 // sh 'echo ${JENKINS_HOME}'
                 sh 'ls -al'
                 sh 'echo $(arch) $(hostname)'
-                sh '$PWD'
-                sh 'ls -al'
+                sh 'go build -o bin/ping-bin ping.go'
+                sh 'tar -zxvf ping-asset-amd64.tar.gz bin'
+                script {
+                    def result = sh(script: 'sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
+                    echo result
+                    env.assethex = result
+                    sh 'echo "$assethex"'
+                }
+                sh 'echo "$assethex"'
             }
         }   
         // stage('test1: compress build file amd64') {
