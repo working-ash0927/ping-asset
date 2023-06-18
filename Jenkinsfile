@@ -59,7 +59,7 @@ pipeline {
         //     }
         // }
         stage('prepare') {
-            parallel amd64: {
+            parallel {
                 stage('go build amd64') {
                     agent {
                         node {
@@ -80,8 +80,6 @@ pipeline {
                         sh 'echo "$assethex"'
                     }
                 }
-            },
-            arm64: {
                 stage('go build arm64') {
                     agent {
                         node {
