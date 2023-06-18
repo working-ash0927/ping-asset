@@ -199,10 +199,12 @@ pipeline {
         stage('update ping-asset.yaml') {
             agent any           
             steps {
-                echo linux_arm64_hex
-                echo linux_amd64_hex
-                env.linux_arm64_hex = linux_arm64_hex
-                env.linux_amd64_hex = linux_amd64_hex
+                script { 
+                    echo linux_arm64_hex
+                    echo linux_amd64_hex
+                    env.linux_arm64_hex = linux_arm64_hex
+                    env.linux_amd64_hex = linux_amd64_hex
+                }                
                 sh 'echo $linux_arm64_hex'
                 sh 'echo $linux_amd64_hex'
                 // script {
