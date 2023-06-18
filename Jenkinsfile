@@ -69,6 +69,7 @@ pipeline {
                 sh 'ls -ali'
             }
         }
+        // 변경되지 않은 소스코드임에도 clone되면서 변경된 inode로 인해 해시값이 변경되는 걸 수정해야함
         stage('go build amd64') {
             agent {
                 node {
@@ -123,7 +124,7 @@ pipeline {
                         } else {
                             echo 'Not exists. Download ping-asset-amd64.tar.gz'
                         }
-                        if (env.isdiffrent == true) {
+                        if (env.isdiffrent == 'true') {
                             echo 'asset file upload'
                             s3Upload(file:'ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
                         } else {
