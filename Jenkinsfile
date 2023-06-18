@@ -121,10 +121,10 @@ pipeline {
                             sh 'echo $assethex'
                             sh 'echo $pastAssethex'
                             if (env.assethex == env.pastAssethex) {
-                                sh 'same asset hex'
+                                echo 'same asset hex'
                                 env.isdiffrent = false
                             } else {
-                                sh 'not same asset hex'
+                                echo 'not same asset hex'
                             }
                         } else {
                             echo 'Not exists. Download ping-asset-amd64.tar.gz'
