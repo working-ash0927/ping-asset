@@ -196,17 +196,20 @@ pipeline {
         }
         
         // ping-asset.yaml 코드를 업데이트
+        // stage('update ping-asset.yaml') {
         stage('update ping-asset.yaml') {
-            agent any           
+            agent any
             steps {
-                script { 
-                    echo linux_arm64_hex
-                    echo linux_amd64_hex
-                    env.linux_arm64_hex = linux_arm64_hex
-                    env.linux_amd64_hex = linux_amd64_hex
-                }                
                 sh 'echo $linux_arm64_hex'
                 sh 'echo $linux_amd64_hex'
+                // script { 
+                //     echo linux_arm64_hex
+                //     echo linux_amd64_hex
+                //     env.linux_arm64_hex = linux_arm64_hex
+                //     env.linux_amd64_hex = linux_amd64_hex
+                // }                
+                // sh 'echo $linux_arm64_hex'
+                // sh 'echo $linux_amd64_hex'
                 // script {
                 //     def result = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
                 //     env.assethex = result
@@ -215,6 +218,29 @@ pipeline {
                 // sh 'echo "$assethex"'
             }
         }
+        stage('a1') {
+            agent {
+                node {
+                    label 'arm64'
+                }
+            }    
+            steps {
+                sh 'echo $linux_arm64_hex'
+                sh 'echo $linux_amd64_hex'
+            }   
+        }
+        stage('a2') {
+            agent {
+                node {
+                    label 'amd64'
+                }
+            }
+            steps {
+                sh 'echo $linux_arm64_hex'
+                sh 'echo $linux_amd64_hex'
+            }
+        }
+
         
         
         // stage('go build arm64') {
