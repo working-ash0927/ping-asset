@@ -8,7 +8,7 @@ pipeline {
     //         // customWorkspace '/home/jenkins/factory'
     //     }
     // }
-    // options { timeout(time 3, unit: 'MINUTES') }
+    options { timeout(time 2, unit: 'MINUTES') }
     
     environment { // Global Env 
         // GO111MODULE = 'on'
@@ -83,9 +83,9 @@ pipeline {
                 sh 'go build -v -o bin/ping-bin ping.go'
                 sh 'tar zcvf ping-asset-amd64.tar.gz ./bin' 
                 script {
-                    def result = sh(script: 'sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
-                    env.assethex = result
-                    echo result
+                    def linux_amd64_hex = sh(script: 'sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
+                    env.assethex = linux_amd64_hex
+                    echo linux_amd64_hex
                 }
                 sh 'echo "$assethex"'
             }
@@ -124,7 +124,7 @@ pipeline {
                             echo 'Not exists. Download ping-asset-amd64.tar.gz'
                         }
                         if (env.isdiffrent == 'true') {
-                            echo 'asset file upload'
+                            echo 'Asset file upload'
                             s3Upload(file:'ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
                         } else {
                             echo 'same file'
@@ -141,14 +141,12 @@ pipeline {
             }            
             steps {
                 // sh 'echo ${JENKINS_HOME}'
-                sh 'ls -al'
-                sh 'echo $(arch) $(hostname)'
                 sh 'go build -v -o bin/ping-bin ping.go'
                 sh 'tar zcvf ping-asset-arm64.tar.gz ./bin' 
                 script {
-                    def result = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
-                    env.assethex = result
-                    echo result
+                    def linux_arm64_hex = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
+                    env.assethex = linux_arm64_hex
+                    echo linux_arm64_hex
                 }
                 sh 'echo "$assethex"'
             }
@@ -196,6 +194,26 @@ pipeline {
                 }
             }
         }
+        
+        // ping-asset.yaml 코드를 업데이트
+        stage('update ping-asset.yaml') {
+            agent {
+                node {
+                    label 'amd64'
+                }
+            }            
+            steps {
+                echo linux_arm64_hex
+                echo linux_amd64_hex
+                // script {
+                //     def result = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
+                //     env.assethex = result
+                //     echo result
+                // }
+                // sh 'echo "$assethex"'
+            }
+        }
+        
         
         // stage('go build arm64') {
         //     agent {
