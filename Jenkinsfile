@@ -65,8 +65,6 @@ pipeline {
                 }
             }
             steps {
-                sh 'rm -rf *'
-                sh 'ls -ali'
                 checkout scm
                 sh 'ls -ali'
             }
@@ -83,10 +81,6 @@ pipeline {
                 sh 'echo $(arch) $(hostname)'
                 sh 'go build -v -o bin/ping-bin ping.go'
                 sh 'tar zcvf ping-asset-amd64.tar.gz ./bin'
-                sh 'echo `sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'`'
-                sh 'echo `sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'`'
-                sh 'echo `sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'`'
-                sh 'echo `sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'`'
                 script {
                     def result = sh(script: 'sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
                     env.assethex = result
