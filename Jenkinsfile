@@ -116,6 +116,8 @@ pipeline {
                         if (env.isdiffrent == true) {
                             echo 'asset file upload'
                             s3Upload(file:'ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
+                        } else {
+                            echo 'same file'
                         }
                     }
                 }
