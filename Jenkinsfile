@@ -58,6 +58,7 @@ pipeline {
         //         sh 'echo "$assethex"'
         //     }
         // }
+        // checkout scm 이 코드 버전관리 명령이라는데 어케 쓰는지 확인 필요
         stage ('test') {
             agent {
                 node {
@@ -84,10 +85,10 @@ pipeline {
                 sh 'tar zcvf ping-asset-amd64.tar.gz ./bin' 
                 script {
                     def linux_amd64_hex = sh(script: 'sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
-                    env.assethex = linux_amd64_hex
+                    env.linux_amd64_hex = linux_amd64_hex
                     echo linux_amd64_hex
                 }
-                sh 'echo "$assethex"'
+                sh 'echo "$linux_amd64_hex"'
             }
         }
         stage ('asset compare amd64') {
@@ -100,7 +101,7 @@ pipeline {
                 withAWS(credentials: 'ash', region: 'ap-northeast-2') {
                     script {
                         env.isdiffrent = true
-                        sh 'echo "new asset hex: $assethex"'
+                        sh 'echo "new asset hex: $linux_amd64_hex"'
                         def assetexists = s3DoesObjectExist(bucket:'thisiscloudfronttest', path:'test/ping-asset-amd64.tar.gz')
                         env.assetexists = assetexists
                         
@@ -112,9 +113,9 @@ pipeline {
                             
                             def result = sh(script: '(sha512sum compare/ping-asset-amd64.tar.gz | awk \'{print $1}\')', returnStdout: true).trim()
                             env.pastAssethex = result
-                            sh 'echo $assethex'
+                            sh 'echo $linux_amd64_hex'
                             sh 'echo $pastAssethex'
-                            if (env.assethex == env.pastAssethex) {
+                            if (env.linux_amd64_hex == env.pastAssethex) {
                                 echo 'same asset hex'
                                 env.isdiffrent = false
                             } else {
@@ -145,10 +146,10 @@ pipeline {
                 sh 'tar zcvf ping-asset-arm64.tar.gz ./bin' 
                 script {
                     def linux_arm64_hex = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
-                    env.assethex = linux_arm64_hex
+                    env.linux_arm64_hex = linux_arm64_hex
                     echo linux_arm64_hex
                 }
-                sh 'echo "$assethex"'
+                sh 'echo "$linux_arm64_hex"'
             }
         }
         stage ('asset compare arm64') {
@@ -161,7 +162,7 @@ pipeline {
                 withAWS(credentials: 'ash', region: 'ap-northeast-2') {
                     script {
                         env.isdiffrent = true
-                        sh 'echo "new asset hex: $assethex"'
+                        sh 'echo "new asset hex: $linux_arm64_hex"'
                         def assetexists = s3DoesObjectExist(bucket:'thisiscloudfronttest', path:'test/ping-asset-arm64.tar.gz')
                         env.assetexists = assetexists
                         
@@ -173,9 +174,9 @@ pipeline {
                             
                             def result = sh(script: '(sha512sum compare/ping-asset-arm64.tar.gz | awk \'{print $1}\')', returnStdout: true).trim()
                             env.pastAssethex = result
-                            sh 'echo $assethex'
+                            sh 'echo $linux_arm64_hex'
                             sh 'echo $pastAssethex'
-                            if (env.assethex == env.pastAssethex) {
+                            if (env.linux_arm64_hex == env.pastAssethex) {
                                 echo 'same asset hex'
                                 env.isdiffrent = false
                             } else {
@@ -202,6 +203,10 @@ pipeline {
             steps {
                 sh 'echo $linux_arm64_hex'
                 sh 'echo $linux_amd64_hex'
+                script {
+                    echo env.linux_arm64_hex
+                    echo env.linux_amd64_hex
+                }
                 // script { 
                 //     echo linux_arm64_hex
                 //     echo linux_amd64_hex
@@ -227,6 +232,10 @@ pipeline {
             steps {
                 sh 'echo $linux_arm64_hex'
                 sh 'echo $linux_amd64_hex'
+                script {
+                    echo env.linux_arm64_hex
+                    echo env.linux_amd64_hex
+                }
             }   
         }
         stage('a2') {
@@ -238,6 +247,10 @@ pipeline {
             steps {
                 sh 'echo $linux_arm64_hex'
                 sh 'echo $linux_amd64_hex'
+                script {
+                    echo env.linux_arm64_hex
+                    echo env.linux_amd64_hex
+                }
             }
         }
 
