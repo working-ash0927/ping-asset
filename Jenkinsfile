@@ -58,6 +58,18 @@ pipeline {
         //         sh 'echo "$assethex"'
         //     }
         // }
+        stage ('test') {
+            agent {
+                node {
+                    label 'amd64'
+                }
+            }
+            steps {
+                sh 'll -i'
+                checkout scm
+                sh 'll -i'                                
+            }
+        }
         stage('go build amd64') {
             agent {
                 node {
