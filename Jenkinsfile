@@ -37,7 +37,7 @@ pipeline {
                 sh 'echo "$assethex"'
             }
         }        
-        stage('prepare amd64') {
+        stage('prepare arm64') {
             agent {
                 node {
                     label 'arm64'
