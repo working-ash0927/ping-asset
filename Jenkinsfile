@@ -9,6 +9,10 @@ pipeline {
     //     }
     // }
     // options { timeout(time 2, unit: 'MINUTES') }
+    options {
+        // 하나라도 실패되었을 경우 모든 병렬 실행중인 job을 중단하고 결과를 실패처리
+        parallelsAlwaysFailFast()
+    }
     
     environment { // Global Env 
         // GO111MODULE = 'on'
@@ -209,26 +213,30 @@ pipeline {
         stage('update ping-asset.yaml') {
             agent any
             steps {
-                sh 'echo $linux_arm64_hex'
                 sh 'echo $linux_amd64_hex'
+                sh 'echo $linux_arm64_hex'
                 script {
-                    echo env.linux_arm64_hex
-                    echo env.linux_amd64_hex
+                    sh '''tee ./ping-asset.yaml << EOF 
+                    ---
+                    type: Asset
+                    api_version: core/v2
+                    metadata:
+                      name: ping-asset
+                    spec:
+                      builds:
+                        - sha512 : $linux_amd64_hex
+                          url: https://thisiscloudfronttest.s3.ap-northeast-2.amazonaws.com/ping-asset-amd64.tar.gz
+                          filters:
+                            - entity.system.os == 'linux'
+                            - entity.system.arch == 'amd64'
+                        - sha512 : $linux_arm64_hex
+                          url: https://thisiscloudfronttest.s3.ap-northeast-2.amazonaws.com/ping-asset-arm64.tar.gz
+                          filters:
+                            - entity.system.os == 'linux'
+                            - entity.system.arch == 'arm64'
+                    '''
                 }
-                // script { 
-                //     echo linux_arm64_hex
-                //     echo linux_amd64_hex
-                //     env.linux_arm64_hex = linux_arm64_hex
-                //     env.linux_amd64_hex = linux_amd64_hex
-                // }                
-                // sh 'echo $linux_arm64_hex'
-                // sh 'echo $linux_amd64_hex'
-                // script {
-                //     def result = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
-                //     env.assethex = result
-                //     echo result
-                // }
-                // sh 'echo "$assethex"'
+                sh 'cat ./ping-asset.yaml'
             }
         }
 
