@@ -96,8 +96,7 @@ pipeline {
                     label 'amd64'
                 } 
             }
-            steps {                
-
+            steps {
                 withAWS(credentials: 'ash', region: 'ap-northeast-2') {
                     script {
                         env.isdiffrent = true
@@ -132,11 +131,72 @@ pipeline {
                         }
                     }
                 }
-                // withAWS(credentials: 'ash', region: 'ap-northeast-2') {
-                //     s3Upload(file:'ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
-                // }
             }
         }
+        stage('go build arm64') {
+            agent {
+                node {
+                    label 'arm64'
+                }
+            }            
+            steps {
+                // sh 'echo ${JENKINS_HOME}'
+                sh 'ls -al'
+                sh 'echo $(arch) $(hostname)'
+                sh 'go build -v -o bin/ping-bin ping.go'
+                sh 'tar zcvf ping-asset-arm64.tar.gz ./bin' 
+                script {
+                    def result = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
+                    env.assethex = result
+                    echo result
+                }
+                sh 'echo "$assethex"'
+            }
+        }
+        stage ('asset compare arm64') {
+            agent { 
+                node { 
+                    label 'arm64'
+                } 
+            }
+            steps {
+                withAWS(credentials: 'ash', region: 'ap-northeast-2') {
+                    script {
+                        env.isdiffrent = true
+                        sh 'echo "new asset hex: $assethex"'
+                        def assetexists = s3DoesObjectExist(bucket:'thisiscloudfronttest', path:'test/ping-asset-arm64.tar.gz')
+                        env.assetexists = assetexists
+                        
+                        // s3에 업로드 된 에셋 압축파일이 있다면 새로 생성된 파일이랑 내용이 달라졌는지 확인
+                        if (env.assetexists == 'true') {
+                            echo 'exists ping-asset-arm64.tar.gz'
+                            sh 'rm -rf compare && mkdir compare'
+                            s3Download(file:'compare/ping-asset-arm64.tar.gz', bucket:'thisiscloudfronttest', path:'test/ping-asset-arm64.tar.gz', force:true)
+                            
+                            def result = sh(script: '(sha512sum compare/ping-asset-arm64.tar.gz | awk \'{print $1}\')', returnStdout: true).trim()
+                            env.pastAssethex = result
+                            sh 'echo $assethex'
+                            sh 'echo $pastAssethex'
+                            if (env.assethex == env.pastAssethex) {
+                                echo 'same asset hex'
+                                env.isdiffrent = false
+                            } else {
+                                echo 'not same asset hex'
+                            }
+                        } else {
+                            echo 'Not exists. Download ping-asset-arm64.tar.gz'
+                        }
+                        if (env.isdiffrent == 'true') {
+                            echo 'asset file upload'
+                            s3Upload(file:'ping-asset-arm64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
+                        } else {
+                            echo 'same file'
+                        }
+                    }
+                }
+            }
+        }
+        
         // stage('go build arm64') {
         //     agent {
         //         node {
