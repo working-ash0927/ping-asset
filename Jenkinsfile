@@ -17,7 +17,7 @@ pipeline {
     }
     tools { go '1.20.x' }
     stages {
-        stage('prepare') {
+        stage('prepare amd64') {
             agent {
                 node {
                     label 'amd64'
@@ -31,13 +31,32 @@ pipeline {
                 sh 'tar -zxvf ping-asset-amd64.tar.gz ./bin'
                 script {
                     def result = sh(script: 'sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
-                    echo result
                     env.assethex = result
                     echo result
                 }
                 sh 'echo "$assethex"'
             }
-        }   
+        }        
+        stage('prepare amd64') {
+            agent {
+                node {
+                    label 'arm64'
+                }
+            }            
+            steps {
+                // sh 'echo ${JENKINS_HOME}'
+                sh 'ls -al'
+                sh 'echo $(arch) $(hostname)'
+                sh 'go build -o bin/ping-bin ping.go'
+                sh 'tar -zxvf ping-asset-arm64.tar.gz ./bin'
+                script {
+                    def result = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
+                    env.assethex = result
+                    echo result
+                }
+                sh 'echo "$assethex"'
+            }
+        }
         // stage('test1: compress build file amd64') {
         //     agent {
         //         node {
