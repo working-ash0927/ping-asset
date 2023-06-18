@@ -110,7 +110,7 @@ pipeline {
                         env.assetexists = assetexists
                         
                         // s3에 업로드 된 에셋 압축파일이 있다면 새로 생성된 파일이랑 내용이 달라졌는지 확인
-                        if (env.assetexists == 'true') {
+                        if (env.assetexists == true) {
                             echo 'exists ping-asset-amd64.tar.gz'
                             sh 'rm -rf compare && mkdir compare'
                             s3Download(file:'compare/ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/ping-asset-amd64.tar.gz', force:true)
@@ -120,7 +120,10 @@ pipeline {
                             sh 'echo $assethex'
                             sh 'echo $pastAssethex'
                             if (env.assethex == env.pastAssethex) {
+                                sh 'same asset hex'
                                 env.isdiffrent = false
+                            } else {
+                                sh 'not same asset hex'
                             }
                         } else {
                             echo 'Not exists. Download ping-asset-amd64.tar.gz'
