@@ -28,7 +28,7 @@ pipeline {
                 sh 'ls -al'
                 sh 'echo $(arch) $(hostname)'
                 sh 'go build -o bin/ping-bin ping.go'
-                sh 'tar -zxvf ping-asset-amd64.tar.gz bin'
+                sh 'tar -zxvf ping-asset-amd64.tar.gz ./bin'
                 script {
                     def result = sh(script: 'sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
                     echo result
