@@ -59,7 +59,7 @@ pipeline {
         //     }
         // }
         stage('prepare') {
-            parallel amd64 : {
+            parallel {
                 agent {
                     node {
                         label 'amd64'
@@ -78,8 +78,7 @@ pipeline {
                     }
                     sh 'echo "$assethex"'
                 }
-            },
-            arm64 : {
+                
                 agent {
                     node {
                         label 'arm64'
