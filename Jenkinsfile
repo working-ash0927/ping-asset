@@ -8,9 +8,7 @@ pipeline {
     //         // customWorkspace '/home/jenkins/factory'
     //     }
     // }
-    options { 
-        timeout(time 2, unit: 'MINUTES') 
-    }
+    // options { timeout(time 2, unit: 'MINUTES') }
     
     environment { // Global Env 
         // GO111MODULE = 'on'
