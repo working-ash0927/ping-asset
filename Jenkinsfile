@@ -65,9 +65,9 @@ pipeline {
                 }
             }
             steps {
-                sh 'll -i'
+                sh 'ls -ali'
                 checkout scm
-                sh 'll -i'                                
+                sh 'ls -ali'
             }
         }
         stage('go build amd64') {
