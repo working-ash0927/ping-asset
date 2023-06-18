@@ -68,7 +68,7 @@ pipeline {
                 // sh 'echo ${JENKINS_HOME}'
                 sh 'ls -al'
                 sh 'echo $(arch) $(hostname)'
-                sh 'go build -o bin/ping-bin ping.go'
+                sh 'go build -v -o bin/ping-bin ping.go'
                 sh 'tar zcvf ping-asset-amd64.tar.gz ./bin'
                 script {
                     def result = sh(script: 'sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
@@ -87,11 +87,10 @@ pipeline {
             steps {                
                 withAWS(credentials: 'ash', region: 'ap-northeast-2') {
                     script {
-                        echo env.assethex
-                        sh '$assethex'
+                        env.isdiffrent = true
+                        sh 'echo "new asset hex: $assethex"'
                         def assetexists = s3DoesObjectExist(bucket:'thisiscloudfronttest', path:'test/ping-asset-amd64.tar.gz')
                         env.assetexists = assetexists
-                        env.isdiffrent = true
                         
                         // s3에 업로드 된 에셋 압축파일이 있다면 새로 생성된 파일이랑 내용이 달라졌는지 확인
                         if (env.assetexists == 'true') {
