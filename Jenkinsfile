@@ -217,23 +217,23 @@ pipeline {
                 sh 'echo $linux_arm64_hex'
                 script {
                     sh '''tee ./ping-asset.yaml << EOF 
-                    ---
-                    type: Asset
-                    api_version: core/v2
-                    metadata:
-                      name: ping-asset
-                    spec:
-                      builds:
-                        - sha512 : $linux_amd64_hex
-                          url: https://thisiscloudfronttest.s3.ap-northeast-2.amazonaws.com/ping-asset-amd64.tar.gz
-                          filters:
-                            - entity.system.os == 'linux'
-                            - entity.system.arch == 'amd64'
-                        - sha512 : $linux_arm64_hex
-                          url: https://thisiscloudfronttest.s3.ap-northeast-2.amazonaws.com/ping-asset-arm64.tar.gz
-                          filters:
-                            - entity.system.os == 'linux'
-                            - entity.system.arch == 'arm64'
+---
+type: Asset
+api_version: core/v2
+metadata:
+  name: ping-asset
+spec:
+  builds:
+    - sha512 : $linux_amd64_hex
+      url: https://thisiscloudfronttest.s3.ap-northeast-2.amazonaws.com/ping-asset-amd64.tar.gz
+      filters:
+      - entity.system.os == 'linux'
+      - entity.system.arch == 'amd64'
+    - sha512 : $linux_arm64_hex
+      url: https://thisiscloudfronttest.s3.ap-northeast-2.amazonaws.com/ping-asset-arm64.tar.gz
+      filters:
+      - entity.system.os == 'linux'
+      - entity.system.arch == 'arm64'
                     '''
                 }
                 sh 'cat ./ping-asset.yaml'
