@@ -85,6 +85,7 @@ pipeline {
                 } 
             }
             steps {                
+                
                 withAWS(credentials: 'ash', region: 'ap-northeast-2') {
                     script {
                         env.isdiffrent = true
