@@ -17,6 +17,8 @@ pipeline {
     environment { // Global Env 
         // GO111MODULE = 'on'
         // AWS_SECRET_ACCESS_KEY   = credentials('')
+        AWS_ACCESS_KEY_ID = credentials('aws_access_key')
+        AWS_SECRET_ACCESS_KEY   = credentials('aws_secret_key')
         AWS_DEFAULT_REGION = 'ap-northeast-2'
     }
     tools { go '1.20.x' }
@@ -237,6 +239,10 @@ spec:
                     '''
                 }
                 sh 'cat ./ping-asset.yaml'
+                sh 'aws s3 cp ./ping-asset.yaml s3://thisiscloudfronttest/test/'
+                sh 'aws s3 ls s3://thisiscloudfronttest/test/ping-asset.yaml'
+                // s3Upload(file:'ping-asset.yaml', bucket:'thisiscloudfronttest', path:'test/')
+                
             }
         }
 
