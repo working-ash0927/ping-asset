@@ -93,6 +93,28 @@ pipeline {
                         sh 'echo "$linux_amd64_hex"'
                     }
                 }
+                stage('go build arm64') {
+                    agent {
+                        node {
+                            label 'arm64'
+                        }
+                    }            
+                    steps {
+                        // sh 'echo ${JENKINS_HOME}'
+                        sh 'go build -v -o bin/ping-bin ping.go'
+                        sh 'tar zcvf ping-asset-arm64.tar.gz ./bin' 
+                        script {
+                            def linux_arm64_hex = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
+                            env.linux_arm64_hex = linux_arm64_hex
+                            echo linux_arm64_hex
+                        }
+                        sh 'echo "$linux_arm64_hex"'
+                    }
+                }
+            }
+        }
+        stage ('asset compare') {
+            parallel {
                 stage ('asset compare amd64') {
                     agent { 
                         node { 
@@ -134,24 +156,6 @@ pipeline {
                                 }
                             }
                         }
-                    }
-                }
-                stage('go build arm64') {
-                    agent {
-                        node {
-                            label 'arm64'
-                        }
-                    }            
-                    steps {
-                        // sh 'echo ${JENKINS_HOME}'
-                        sh 'go build -v -o bin/ping-bin ping.go'
-                        sh 'tar zcvf ping-asset-arm64.tar.gz ./bin' 
-                        script {
-                            def linux_arm64_hex = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
-                            env.linux_arm64_hex = linux_arm64_hex
-                            echo linux_arm64_hex
-                        }
-                        sh 'echo "$linux_arm64_hex"'
                     }
                 }
                 stage ('asset compare arm64') {
