@@ -59,46 +59,50 @@ pipeline {
         //     }
         // }
         stage('prepare') {
-            parallel {
-                agent {
-                    node {
-                        label 'amd64'
+            parallel amd64: {
+                stage('go build amd64') {
+                    agent {
+                        node {
+                            label 'amd64'
+                        }
+                    }            
+                    steps {
+                        // sh 'echo ${JENKINS_HOME}'
+                        sh 'ls -al'
+                        sh 'echo $(arch) $(hostname)'
+                        sh 'go build -o bin/ping-bin ping.go'
+                        sh 'tar zcvf ping-asset-amd64.tar.gz ./bin'
+                        script {
+                            def result = sh(script: 'sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
+                            env.assethex = result
+                            echo result
+                        }
+                        sh 'echo "$assethex"'
                     }
-                }            
-                steps {
-                    // sh 'echo ${JENKINS_HOME}'
-                    sh 'ls -al'
-                    sh 'echo $(arch) $(hostname)'
-                    sh 'go build -o bin/ping-bin ping.go'
-                    sh 'tar zcvf ping-asset-amd64.tar.gz ./bin'
-                    script {
-                        def result = sh(script: 'sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
-                        env.assethex = result
-                        echo result
-                    }
-                    sh 'echo "$assethex"'
                 }
-                
-                agent {
-                    node {
-                        label 'arm64'
+            },
+            arm64: {
+                stage('go build arm64') {
+                    agent {
+                        node {
+                            label 'arm64'
+                        }
+                    }            
+                    steps {
+                        // sh 'echo ${JENKINS_HOME}'
+                        sh 'ls -al'
+                        sh 'echo $(arch) $(hostname)'
+                        sh 'go build -o bin/ping-bin ping.go'
+                        sh 'echo $PWD'
+                        sh 'tar zcvf ping-asset-arm64.tar.gz bin'
+                        script {
+                            def result = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
+                            env.assethex = result
+                            echo result
+                        }
+                        sh 'echo "$assethex"'
                     }
-                }            
-                steps {
-                    // sh 'echo ${JENKINS_HOME}'
-                    sh 'ls -al'
-                    sh 'echo $(arch) $(hostname)'
-                    sh 'go build -o bin/ping-bin ping.go'
-                    sh 'echo $PWD'
-                    sh 'tar zcvf ping-asset-arm64.tar.gz bin'
-                    script {
-                        def result = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
-                        env.assethex = result
-                        echo result
-                    }
-                    sh 'echo "$assethex"'
                 }
-
             }
         }
         // stage('compare asset file amd64') {
