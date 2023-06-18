@@ -13,7 +13,7 @@ pipeline {
     environment { // Global Env 
         // GO111MODULE = 'on'
         // AWS_SECRET_ACCESS_KEY   = credentials('')
-        AWS_DEFAULT_REGION      = 'ap-northeast-2'
+        AWS_DEFAULT_REGION = 'ap-northeast-2'
     }
     tools { go '1.20.x' }
     stages {
@@ -184,7 +184,7 @@ pipeline {
                                 echo 'not same asset hex'
                             }
                         } else {
-                            echo 'Not exists. Download ping-asset-arm64.tar.gz'
+                            echo 'Not exists. Must be upload ping-asset-arm64.tar.gz'
                         }
                         if (env.isdiffrent == 'true') {
                             echo 'asset file upload'
