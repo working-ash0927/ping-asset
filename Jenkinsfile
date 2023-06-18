@@ -33,7 +33,7 @@ pipeline {
                     def result = sh(script: 'sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
                     echo result
                     env.assethex = result
-                    sh 'echo "$assethex"'
+                    echo result
                 }
                 sh 'echo "$assethex"'
             }
