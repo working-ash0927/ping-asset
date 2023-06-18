@@ -1,6 +1,6 @@
 // Sample
 pipeline {    
-    // Default: agent node any
+    // 각 스텝마다 노드를 정의하기 때문에 선언 안함. 만약 any일 경우 모든 노드 중 임의 하나에서만 동작함
     agent none
     // agent {
     //     node {
