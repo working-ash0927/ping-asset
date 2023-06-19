@@ -159,7 +159,7 @@ pipeline {
             }
         }
         // ping-asset.yaml 코드를 업데이트
-        // 추후 버전정보 추가 고려해보기
+        // 추후 버전정보 추가 고려해보기 https://osc131.tistory.com/90
         stage('update ping-asset.yaml') {
             agent any
             steps {
