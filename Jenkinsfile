@@ -100,7 +100,7 @@ pipeline {
                                 sh 'aws s3 cp compare/ping-asset-amd64.tar.gz s3://thisiscloudfronttest/test/ping-asset-amd64.tar.gz'
                                 
                                 // def result = sh(script: '(sha512sum compare/ping-asset-amd64.tar.gz | awk \'{print $1}\')', returnStdout: true).trim()
-                                def result = sh'(aws s3 ls s3://thisiscloudfronttest/test/ping-asset-amd64.tar.gz >/dev/null 2>&1 && echo true)', returnStdout: true).trim()
+                                def result = sh(script: '(aws s3 ls s3://thisiscloudfronttest/test/ping-asset-amd64.tar.gz >/dev/null 2>&1 && echo true)', returnStdout: true).trim()
                                 echo result
                                 env.pastAssethex = result
                                 sh 'echo $linux_amd64_hex'
