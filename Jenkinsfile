@@ -159,7 +159,7 @@ pipeline {
             }
         }
         // ping-asset.yaml 코드를 업데이트
-        // stage('update ping-asset.yaml') {
+        // 추후 버전정보 추가 고려해보기
         stage('update ping-asset.yaml') {
             agent any
             steps {
