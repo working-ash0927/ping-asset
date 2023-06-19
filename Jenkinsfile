@@ -23,47 +23,6 @@ pipeline {
     }
     tools { go '1.20.x' }
     stages {
-        // stage('prepare amd64') {
-        //     agent {
-        //         node {
-        //             label 'amd64'
-        //         }
-        //     }            
-        //     steps {
-        //         // sh 'echo ${JENKINS_HOME}'
-        //         sh 'ls -al'
-        //         sh 'echo $(arch) $(hostname)'
-        //         sh 'go build -o bin/ping-bin ping.go'
-        //         sh 'tar zcvf ping-asset-amd64.tar.gz ./bin'
-        //         script {
-        //             def result = sh(script: 'sha512sum ping-asset-amd64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
-        //             env.assethex = result
-        //             echo result
-        //         }
-        //         sh 'echo "$assethex"'
-        //     }
-        // }        
-        // stage('prepare arm64') {
-        //     agent {
-        //         node {
-        //             label 'arm64'
-        //         }
-        //     }            
-        //     steps {
-        //         // sh 'echo ${JENKINS_HOME}'
-        //         sh 'ls -al'
-        //         sh 'echo $(arch) $(hostname)'
-        //         sh 'go build -o bin/ping-bin ping.go'
-        //         sh 'echo $PWD'
-        //         sh 'tar zcvf ping-asset-arm64.tar.gz bin'
-        //         script {
-        //             def result = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
-        //             env.assethex = result
-        //             echo result
-        //         }
-        //         sh 'echo "$assethex"'
-        //     }
-        // }
         // checkout scm 이 코드 버전관리 명령이라는데 어케 쓰는지 확인 필요
         stage ('test') {
             agent {
@@ -128,38 +87,38 @@ pipeline {
                         } 
                     }
                     steps {
-                        withAWS(credentials: 'ash', region: 'ap-northeast-2') {
-                            script {
-                                env.isdiffrent = true
-                                sh 'echo "new asset hex: $linux_amd64_hex"'
-                                def assetexists = s3DoesObjectExist(bucket:'thisiscloudfronttest', path:'test/ping-asset-amd64.tar.gz')
-                                env.assetexists = assetexists
+                        script {
+                            env.isdiffrent = true
+                            sh 'echo "new asset hex: $linux_amd64_hex"'
+                            def assetexists = s3DoesObjectExist(bucket:'thisiscloudfronttest', path:'test/ping-asset-amd64.tar.gz')
+                            env.assetexists = assetexists
+                            
+                            // s3에 업로드 된 에셋 압축파일이 있다면 새로 생성된 파일이랑 내용이 달라졌는지 확인
+                            if (env.assetexists == 'true') {
+                                echo 'exists ping-asset-amd64.tar.gz'
+                                sh 'rm -rf compare && mkdir compare'
+                                sh 'aws s3 cp compare/ping-asset-amd64.tar.gz s3://thisiscloudfronttest/test/ping-asset-amd64.tar.gz'
                                 
-                                // s3에 업로드 된 에셋 압축파일이 있다면 새로 생성된 파일이랑 내용이 달라졌는지 확인
-                                if (env.assetexists == 'true') {
-                                    echo 'exists ping-asset-amd64.tar.gz'
-                                    sh 'rm -rf compare && mkdir compare'
-                                    s3Download(file:'compare/ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/ping-asset-amd64.tar.gz', force:true)
-                                    
-                                    def result = sh(script: '(sha512sum compare/ping-asset-amd64.tar.gz | awk \'{print $1}\')', returnStdout: true).trim()
-                                    env.pastAssethex = result
-                                    sh 'echo $linux_amd64_hex'
-                                    sh 'echo $pastAssethex'
-                                    if (env.linux_amd64_hex == env.pastAssethex) {
-                                        echo 'same asset hex'
-                                        env.isdiffrent = false
-                                    } else {
-                                        echo 'not same asset hex'
-                                    }
+                                // def result = sh(script: '(sha512sum compare/ping-asset-amd64.tar.gz | awk \'{print $1}\')', returnStdout: true).trim()
+                                def result = sh'(aws s3 ls s3://thisiscloudfronttest/test/ping-asset-amd64.tar.gz >/dev/null 2>&1 && echo true)', returnStdout: true).trim()
+                                echo result
+                                env.pastAssethex = result
+                                sh 'echo $linux_amd64_hex'
+                                sh 'echo $pastAssethex'
+                                if (env.linux_amd64_hex == env.pastAssethex) {
+                                    echo 'same asset hex'
+                                    env.isdiffrent = false
                                 } else {
-                                    echo 'Not exists. Download ping-asset-amd64.tar.gz'
+                                    echo 'not same asset hex'
                                 }
-                                if (env.isdiffrent == 'true') {
-                                    echo 'Asset file upload'
-                                    s3Upload(file:'ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
-                                } else {
-                                    echo 'same file'
-                                }
+                            } else {
+                                echo 'Not exists. Download ping-asset-amd64.tar.gz'
+                            }
+                            if (env.isdiffrent == 'true') {
+                                echo 'Asset file upload'
+                                s3Upload(file:'ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
+                            } else {
+                                echo 'same file'
                             }
                         }
                     }
@@ -209,6 +168,96 @@ pipeline {
                 }
             }
         }
+        // stage ('asset compare') {
+        //     parallel {
+        //         stage ('asset compare amd64') {
+        //             agent { 
+        //                 node { 
+        //                     label 'amd64'
+        //                 } 
+        //             }
+        //             steps {
+        //                 withAWS(credentials: 'ash', region: 'ap-northeast-2') {
+        //                     script {
+        //                         env.isdiffrent = true
+        //                         sh 'echo "new asset hex: $linux_amd64_hex"'
+        //                         def assetexists = s3DoesObjectExist(bucket:'thisiscloudfronttest', path:'test/ping-asset-amd64.tar.gz')
+        //                         env.assetexists = assetexists
+                                
+        //                         // s3에 업로드 된 에셋 압축파일이 있다면 새로 생성된 파일이랑 내용이 달라졌는지 확인
+        //                         if (env.assetexists == 'true') {
+        //                             echo 'exists ping-asset-amd64.tar.gz'
+        //                             sh 'rm -rf compare && mkdir compare'
+        //                             s3Download(file:'compare/ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/ping-asset-amd64.tar.gz', force:true)
+                                    
+        //                             def result = sh(script: '(sha512sum compare/ping-asset-amd64.tar.gz | awk \'{print $1}\')', returnStdout: true).trim()
+        //                             env.pastAssethex = result
+        //                             sh 'echo $linux_amd64_hex'
+        //                             sh 'echo $pastAssethex'
+        //                             if (env.linux_amd64_hex == env.pastAssethex) {
+        //                                 echo 'same asset hex'
+        //                                 env.isdiffrent = false
+        //                             } else {
+        //                                 echo 'not same asset hex'
+        //                             }
+        //                         } else {
+        //                             echo 'Not exists. Download ping-asset-amd64.tar.gz'
+        //                         }
+        //                         if (env.isdiffrent == 'true') {
+        //                             echo 'Asset file upload'
+        //                             s3Upload(file:'ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
+        //                         } else {
+        //                             echo 'same file'
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //         stage ('asset compare arm64') {
+        //             agent { 
+        //                 node { 
+        //                     label 'arm64'
+        //                 } 
+        //             }
+        //             steps {
+        //                 withAWS(credentials: 'ash', region: 'ap-northeast-2') {
+        //                     script {
+        //                         env.isdiffrent = true
+        //                         sh 'echo "new asset hex: $linux_arm64_hex"'
+        //                         def assetexists = s3DoesObjectExist(bucket:'thisiscloudfronttest', path:'test/ping-asset-arm64.tar.gz')
+        //                         env.assetexists = assetexists
+                                
+        //                         // s3에 업로드 된 에셋 압축파일이 있다면 새로 생성된 파일이랑 내용이 달라졌는지 확인
+        //                         if (env.assetexists == 'true') {
+        //                             echo 'exists ping-asset-arm64.tar.gz'
+        //                             sh 'rm -rf compare && mkdir compare'
+        //                             s3Download(file:'compare/ping-asset-arm64.tar.gz', bucket:'thisiscloudfronttest', path:'test/ping-asset-arm64.tar.gz', force:true)
+                                    
+        //                             def result = sh(script: '(sha512sum compare/ping-asset-arm64.tar.gz | awk \'{print $1}\')', returnStdout: true).trim()
+        //                             env.pastAssethex = result
+        //                             sh 'echo $linux_arm64_hex'
+        //                             sh 'echo $pastAssethex'
+        //                             if (env.linux_arm64_hex == env.pastAssethex) {
+        //                                 echo 'same asset hex'
+        //                                 env.isdiffrent = false
+        //                             } else {
+        //                                 echo 'not same asset hex'
+        //                             }
+        //                         } else {
+        //                             echo 'Not exists. Must be upload ping-asset-arm64.tar.gz'
+        //                         }
+        //                         if (env.isdiffrent == 'true') {
+        //                             echo 'asset file upload'
+        //                             s3Upload(file:'ping-asset-arm64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
+        //                         } else {
+        //                             echo 'same file'
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
         
         // ping-asset.yaml 코드를 업데이트
         // stage('update ping-asset.yaml') {
@@ -242,68 +291,7 @@ spec:
                 sh 'aws s3 cp ./ping-asset.yaml s3://thisiscloudfronttest/test/'
                 sh 'aws s3 ls s3://thisiscloudfronttest/test/ping-asset.yaml'
                 // s3Upload(file:'ping-asset.yaml', bucket:'thisiscloudfronttest', path:'test/')
-                
             }
         }
-
-        
-        
-        // stage('go build arm64') {
-        //     agent {
-        //         node {
-        //             label 'arm64'
-        //         }
-        //     }            
-        //     steps {
-        //         // sh 'echo ${JENKINS_HOME}'
-        //         sh 'ls -al'
-        //         sh 'echo $(arch) $(hostname)'
-        //         sh 'go build -o bin/ping-bin ping.go'
-        //         sh 'tar zcvf ping-asset-arm64.tar.gz bin'
-        //         script {
-        //             def result = sh(script: 'sha512sum ping-asset-arm64.tar.gz | awk \'{print $1}\'', returnStdout: true).trim()
-        //             env.assethex = result
-        //             echo result
-        //         }
-        //         sh 'echo "$assethex"'
-        //     }
-        // }
-
-        
-        // stage('uplode asset upload') {
-
-        //     agent { 
-        //         node { 
-        //             label 'amd64'
-        //             customWorkspace '/var/lib/jenkins/workspace/ping-build'
-        //         } 
-        //     }
-        //     steps{
-        //         withAWS(credentials: 'ash', region: 'ap-northeast-2') {
-        //             s3Upload(file:'ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
-        //         }
-        //     }
-        // }
-        // stage('Build arm64') {
-        //     agent {
-        //         node {
-        //             label 'arm64'
-        //             // 신규 사용자 대신 ssh 원격접속 되는 기본값으로 지정하다보니..
-        //             customWorkspace '/home/ec2-user/workspace/ping-build'
-        //         }
-        //     }
-            
-        //     steps {
-        //         sh 'echo ${JENKINS_HOME}' 
-        //         sh 'echo $(arch) $(hostname)'
-        //         sh 'ls -al'
-        //         sh 'echo $PWD'
-        //         sh 'ls -al bin/'
-        //         sh 'tar zcvf ping-bin.tar.gz ./bin '
-        //         sh 'echo $(sha512sum ping-bin.tar.gz)'
-        //         sh 'assethex=$(sha512sum ping-bin.tar.gz)'
-        //         sh 'echo $assethex'
-        //     }
-        // }
     }    
 }
