@@ -91,8 +91,8 @@ pipeline {
                             env.isdiffrent = true
                             sh 'echo "new asset hex: $linux_amd64_hex"'
                             //def assetexists = s3DoesObjectExist(bucket:'thisiscloudfronttest', path:'test/ping-asset-amd64.tar.gz')
-                            def assetexists = sh(script: '(aws s3 ls s3://thisiscloudfronttest/test/ping-asset-amd64.tar.gz >/dev/null 2>&1 && echo true)', returnStdout: true).trim()
-                            
+                            def assetexists = sh(script: 'aws s3 ls s3://thisiscloudfronttest/test/ping-asset-amd64.tar.gz >/dev/null 2>&1 && echo true', returnStdout: true).trim()
+                            echo assetexists
                             env.assetexists = assetexists
                             
                             // s3에 업로드 된 에셋 압축파일이 있다면 새로 생성된 파일이랑 내용이 달라졌는지 확인
