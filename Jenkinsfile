@@ -106,7 +106,7 @@ pipeline {
                             }
                             if (env.isdiffrent == 'true') {
                                 echo 'Asset file upload'
-                                sh 'aws s3 cp ping-asset-amd64.tar.gz s3://thisiscloudfronttest/test/'
+                                sh 'aws s3 cp ping-asset-amd64.tar.gz s3://thisiscloudfronttest/test/ --acl public-read'
                             } else {
                                 echo 'same file'
                             }
@@ -149,7 +149,7 @@ pipeline {
                             if (env.isdiffrent == 'true') {
                                 echo 'asset file upload'
                                 // s3Upload(file:'ping-asset-arm64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
-                                sh 'aws s3 cp ping-asset-arm64.tar.gz s3://thisiscloudfronttest/test/'
+                                sh 'aws s3 cp ping-asset-arm64.tar.gz s3://thisiscloudfronttest/test/ --acl public-read'
                             } else {
                                 echo 'same file'
                             }
@@ -188,9 +188,28 @@ spec:
                     '''
                 }
                 sh 'cat ./ping-asset.yaml'
-                sh 'aws s3 cp ./ping-asset.yaml s3://thisiscloudfronttest/test/'
+                sh 'aws s3 cp ./ping-asset.yaml s3://thisiscloudfronttest/test/ --acl public-read'
             }
         }
-    }    
+        post {
+            always {
+                echo 'One way or another, I have finished'
+                deleteDir() /* clean up our workspace */
+            }
+            success {
+                echo 'I succeeded!'
+            }
+            unstable {
+                echo 'I am unstable :/'
+            }
+            failure {
+                echo 'I failed :('
+            }
+            changed {
+                echo 'Things were different before...'
+            }
+        }  
+    }
+    
 }
 
