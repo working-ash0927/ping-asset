@@ -106,7 +106,7 @@ pipeline {
                             }
                             if (env.isdiffrent == 'true') {
                                 echo 'Asset file upload'
-                                sh 'aws s3 cp ping-asset-amd64.tar.gz s3://thisiscloudfronttest/test/ --acl public-read'
+                                sh 'aws s3 cp ping-asset-amd64.tar.gz s3://thisiscloudfronttest/test/ping-asset-amd64.tar.gz --acl public-read'
                             } else {
                                 echo 'same file'
                             }
@@ -149,7 +149,7 @@ pipeline {
                             if (env.isdiffrent == 'true') {
                                 echo 'asset file upload'
                                 // s3Upload(file:'ping-asset-arm64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
-                                sh 'aws s3 cp ping-asset-arm64.tar.gz s3://thisiscloudfronttest/test/ --acl public-read'
+                                sh 'aws s3 cp ping-asset-arm64.tar.gz s3://thisiscloudfronttest/test/ping-asset-arm64.tar.gz --acl public-read'
                             } else {
                                 echo 'same file'
                             }
@@ -188,7 +188,7 @@ spec:
                     '''
                 }
                 sh 'cat ./ping-asset.yaml'
-                sh 'aws s3 cp ./ping-asset.yaml s3://thisiscloudfronttest/test/ --acl public-read'
+                sh 'aws s3 cp ./ping-asset.yaml s3://thisiscloudfronttest/test/ping-asset.yaml --acl public-read'
             }
         }
         // post {
