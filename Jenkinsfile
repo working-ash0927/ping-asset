@@ -99,11 +99,11 @@ pipeline {
                             if (env.assetexists == 'true') {
                                 echo 'exists ping-asset-amd64.tar.gz'
                                 sh 'rm -rf compare && mkdir compare'
-                                
-                                
-                                def result = sh(script: '(sha512sum compare/ping-asset-amd64.tar.gz | awk \'{print $1}\')', returnStdout: true).trim()
-                                
+                                sh 'aws s3 cp s3://thisiscloudfronttest/test/ping-asset-amd64.tar.gz compare/ping-asset-amd64.tar.gz'
+                                // s3Download(file:'compare/ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/ping-asset-amd64.tar.gz', force:true)
+                                def result = sh(script: '(sha512sum compare/ping-asset-amd64.tar.gz | awk \'{print $1}\')', returnStdout: true).trim()                                
                                 echo result
+                                
                                 env.pastAssethex = result
                                 sh 'echo $linux_amd64_hex'
                                 sh 'echo $pastAssethex'
@@ -118,7 +118,8 @@ pipeline {
                             }
                             if (env.isdiffrent == 'true') {
                                 echo 'Asset file upload'
-                                s3Upload(file:'ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
+                                // s3Upload(file:'ping-asset-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
+                                sh 'aws s3 cp ping-asset-amd64.tar.gz s3://thisiscloudfronttest/test/'
                             } else {
                                 echo 'same file'
                             }
@@ -136,14 +137,16 @@ pipeline {
                             script {
                                 env.isdiffrent = true
                                 sh 'echo "new asset hex: $linux_arm64_hex"'
-                                def assetexists = s3DoesObjectExist(bucket:'thisiscloudfronttest', path:'test/ping-asset-arm64.tar.gz')
+                                // def assetexists = s3DoesObjectExist(bucket:'thisiscloudfronttest', path:'test/ping-asset-arm64.tar.gz')
+                                def assetexists = sh(script: 'aws s3 ls s3://thisiscloudfronttest/test/ping-asset-arm64.tar.gz >/dev/null 2>&1 && echo true', returnStdout: true).trim()
                                 env.assetexists = assetexists
                                 
                                 // s3에 업로드 된 에셋 압축파일이 있다면 새로 생성된 파일이랑 내용이 달라졌는지 확인
                                 if (env.assetexists == 'true') {
                                     echo 'exists ping-asset-arm64.tar.gz'
                                     sh 'rm -rf compare && mkdir compare'
-                                    s3Download(file:'compare/ping-asset-arm64.tar.gz', bucket:'thisiscloudfronttest', path:'test/ping-asset-arm64.tar.gz', force:true)
+                                    sh 'aws s3 cp s3://thisiscloudfronttest/test/ping-asset-arm64.tar.gz compare/ping-asset-arm64.tar.gz'
+                                    //s3Download(file:'compare/ping-asset-arm64.tar.gz', bucket:'thisiscloudfronttest', path:'test/ping-asset-arm64.tar.gz', force:true)
                                     
                                     def result = sh(script: '(sha512sum compare/ping-asset-arm64.tar.gz | awk \'{print $1}\')', returnStdout: true).trim()
                                     env.pastAssethex = result
@@ -160,7 +163,8 @@ pipeline {
                                 }
                                 if (env.isdiffrent == 'true') {
                                     echo 'asset file upload'
-                                    s3Upload(file:'ping-asset-arm64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
+                                    // s3Upload(file:'ping-asset-arm64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
+                                    sh 'aws s3 cp ping-asset-arm64.tar.gz s3://thisiscloudfronttest/test/'
                                 } else {
                                     echo 'same file'
                                 }
