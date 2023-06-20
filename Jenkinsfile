@@ -82,7 +82,7 @@ pipeline {
                             // def win_amd64_hex = bat(script: '(Get-FileHash -Path ping-asset-win-amd64.tar.gz -Algorithm SHA512).Hash', returnStdout: true)
                             def win_amd64_hex = powershell(script:'(Get-FileHash -Path ping-asset-win-amd64.tar.gz -Algorithm SHA512).Hash')
                             env.win_amd64_hex = win_amd64_hex
-                            println win_amd64_hex
+                            println(win_amd64_hex)
                         }
                     }
                 }
