@@ -185,7 +185,7 @@ pipeline {
                     }
                     steps {
                         script {
-                            powershell'aws s3 ls'
+                            bat(script: 'aws s3 ls')
                             // def test = powershell(script: 'aws s3 cp ping-asset-win-amd64.tar.gz s3://thisiscloudfronttest/test/ping-asset-win-amd64.tar.gz --acl public-read', returnStdout: true)
                             // println test
                             // env.isdiffrent = true
