@@ -65,6 +65,23 @@ pipeline {
                         }
                     }
                 }
+                stage('go build win_amd64') {
+                    agent {
+                        node {
+                            label 'win_amd64'
+                        }
+                    }            
+                    steps {
+                        // sh 'echo ${JENKINS_HOME}'
+                        sh 'go build -v -o bin/ping-bin ping.go'
+                        sh 'tar zcvf ping-asset-win-amd64.tar.gz ./bin' 
+                        script {
+                            def win_amd64_hex = powershell(script: '(Get-FileHash -Path disk-asset-win.tar.gz -Algorithm SHA512).Hash', returnStdout: true).trim()
+                            env.win_amd64_hex = win_amd64_hex
+                            echo win_amd64_hex
+                        }
+                    }
+                }
             }
         }
         stage ('asset compare') {
@@ -156,6 +173,52 @@ pipeline {
                         }
                     }
                 }
+                // 스크립트 윈도우 버전으로 갱신 필요
+                stage ('asset compare win_amd64') {
+                    agent { 
+                        node { 
+                            label 'win_amd64'
+                        } 
+                    }
+                    steps {
+                        script {
+                            powershell 'aws s3 cp ping-asset-win-amd64.tar.gz s3://thisiscloudfronttest/test/ping-asset-arm64.tar.gz --acl public-read'
+
+                            // env.isdiffrent = true
+                            // sh 'echo "new asset hex: $win_amd64_hex"'
+                            // def assetexists = sh(script: 'aws s3 ls s3://thisiscloudfronttest/test/ping-asset-arm64.tar.gz >/dev/null 2>&1 && echo true || echo false', returnStdout: true).trim()
+                            // env.assetexists = assetexists
+                            
+                            // // s3에 업로드 된 에셋 압축파일이 있다면 새로 생성된 파일이랑 내용이 달라졌는지 확인
+                            // if (env.assetexists == 'true') {
+                            //     echo 'exists ping-asset-arm64.tar.gz'
+                            //     sh 'rm -r compare && mkdir compare'
+                            //     sh 'aws s3 cp s3://thisiscloudfronttest/test/ping-asset-arm64.tar.gz compare/ping-asset-arm64.tar.gz'
+                            //     def result = sh(script: '(sha512sum compare/ping-asset-arm64.tar.gz | awk \'{print $1}\')', returnStdout: true).trim()
+                            //     echo result
+                            //     env.pastAssethex = result
+
+                            //     sh 'echo $win_amd64_hex'
+                            //     sh 'echo $pastAssethex'
+                            //     if (env.win_amd64_hex == env.pastAssethex) {
+                            //         echo 'same asset hex'
+                            //         env.isdiffrent = false
+                            //     } else {
+                            //         echo 'not same asset hex'
+                            //     }
+                            // } else {
+                            //     echo 'Not exists. Must be upload ping-asset-arm64.tar.gz'
+                            // }
+                            // if (env.isdiffrent == 'true') {
+                            //     echo 'asset file upload'
+                            //     // s3Upload(file:'ping-asset-arm64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
+                            //     sh 'aws s3 cp ping-asset-arm64.tar.gz s3://thisiscloudfronttest/test/ping-asset-arm64.tar.gz --acl public-read'
+                            // } else {
+                            //     echo 'same file'
+                            // }
+                        }
+                    }
+                }
             }
         }
         // ping-asset.yaml 코드를 업데이트
@@ -166,6 +229,7 @@ pipeline {
                 // Jenkins 내 등록된 환경변수라 아무데서나 참조 가능
                 sh 'echo $linux_amd64_hex'
                 sh 'echo $linux_arm64_hex'
+                sh 'echo $win_amd64_hex'
                 script {
                     sh '''tee ./ping-asset.yaml << EOF 
 ---
@@ -185,6 +249,11 @@ spec:
       filters:
       - entity.system.os == 'linux'
       - entity.system.arch == 'arm64'
+    - sha512 : $win_amd64_hex
+      url: https://thisiscloudfronttest.s3.ap-northeast-2.amazonaws.com/test/ping-asset-win-amd64.tar.gz
+      filters:
+      - entity.system.os == 'windows'
+      - entity.system.arch == 'amd64'
                     '''
                 }
                 sh 'cat ./ping-asset.yaml'
