@@ -185,8 +185,9 @@ pipeline {
                     }
                     steps {
                         script {
-                            def test = powershell(script: 'aws s3 cp ping-asset-win-amd64.tar.gz s3://thisiscloudfronttest/test/ping-asset-win-amd64.tar.gz --acl public-read', returnStdout: true)
-                            println test
+                            powershell'aws s3 ls'
+                            // def test = powershell(script: 'aws s3 cp ping-asset-win-amd64.tar.gz s3://thisiscloudfronttest/test/ping-asset-win-amd64.tar.gz --acl public-read', returnStdout: true)
+                            // println test
                             // env.isdiffrent = true
                             // sh 'echo "new asset hex: $win_amd64_hex"'
                             // def assetexists = sh(script: 'aws s3 ls s3://thisiscloudfronttest/test/ping-asset-arm64.tar.gz >/dev/null 2>&1 && echo true || echo false', returnStdout: true).trim()
