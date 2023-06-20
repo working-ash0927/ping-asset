@@ -80,7 +80,7 @@ pipeline {
                         '''
                         script {
                             // def win_amd64_hex = bat(script: '(Get-FileHash -Path ping-asset-win-amd64.tar.gz -Algorithm SHA512).Hash', returnStdout: true)
-                            def win_amd64_hex = powershell(script:'(Get-FileHash -Path ping-asset-win-amd64.tar.gz -Algorithm SHA512).Hash')
+                            def win_amd64_hex = powershell(script:'(Get-FileHash -Path ping-asset-win-amd64.tar.gz -Algorithm SHA512).Hash', returnStdout: true)
                             env.win_amd64_hex = win_amd64_hex
                             println(win_amd64_hex)
                         }
@@ -186,7 +186,9 @@ pipeline {
                     }
                     steps {
                         script {
-                            bat(script: 'aws s3 ls')
+                            withAWS(credentials: 'ash', region: 'ap-northeast-2') {
+                                s3Upload(file:'ping-asset-win-amd64.tar.gz', bucket:'thisiscloudfronttest', path:'test/')
+                            }
                             // def test = powershell(script: 'aws s3 cp ping-asset-win-amd64.tar.gz s3://thisiscloudfronttest/test/ping-asset-win-amd64.tar.gz --acl public-read', returnStdout: true)
                             // println test
                             // env.isdiffrent = true
