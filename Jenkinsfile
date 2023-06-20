@@ -73,8 +73,8 @@ pipeline {
                     }            
                     steps {
                         // sh 'echo ${JENKINS_HOME}'
-                        powershell 'go build -v -o bin/ping-bin ping.go'
-                        powershell 'tar zcvf ping-asset-win-amd64.tar.gz ./bin' 
+                        powershell 'go build -v -o .\\bin\\ping-bin.exe ping.go'
+                        powershell 'tar zcvf ping-asset-win-amd64.tar.gz .\\bin' 
                         script {
                             def win_amd64_hex = powershell(script: '(Get-FileHash -Path disk-asset-win.tar.gz -Algorithm SHA512).Hash', returnStdout: true).trim()
                             env.win_amd64_hex = win_amd64_hex
